@@ -1,0 +1,14 @@
+---
+# xv6 source files include kernel/types.h, kernel/stat.h, user/user.h which
+# only exist inside the xv6-riscv build tree (inside Docker). Suppress the
+# false-positive IDE errors so they don't obscure real issues.
+Diagnostics:
+  Suppress:
+    - pp_file_not_found
+    - undeclared_var_use
+    - unknown_typename
+    - array_incomplete_or_sizeless_type
+    - typecheck_arithmetic_incomplete_or_sizeless_type
+    - typecheck_incomplete_tag
+    - implicit-function-declaration
+    - Wimplicit-function-declaration

@@ -1,0 +1,16 @@
+#!/usr/bin/expect -f
+set timeout 120
+
+spawn qemu-system-riscv64 \
+    -machine virt -bios none \
+    -kernel kernel/kernel \
+    -m 128M -smp 1 -nographic \
+    -global virtio-mmio.force-legacy=false \
+    -drive file=fs.img,if=none,format=raw,id=x0 \
+    -device virtio-blk-device,drive=x0,bus=virtio-mmio-bus.0
+
+expect "$ " { send "testbench\r" }
+expect "All 5 custom syscalls executed successfully!"
+after 500
+send "q\r"
+expect eof
