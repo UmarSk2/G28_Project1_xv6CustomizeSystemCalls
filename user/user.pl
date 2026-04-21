@@ -1,0 +1,2 @@
+entry("getprocs");
+entry("sigsend");
