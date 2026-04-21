@@ -1,0 +1,39 @@
+#!/usr/bin/expect -f
+# Boots xv6 in QEMU, runs testbench, then exits.
+
+set timeout 120
+
+spawn qemu-system-riscv64 \
+    -machine virt -bios none \
+    -kernel kernel/kernel \
+    -m 128M -smp 1 -nographic \
+    -global virtio-mmio.force-legacy=false \
+    -drive file=fs.img,if=none,format=raw,id=x0 \
+    -device virtio-blk-device,drive=x0,bus=virtio-mmio-bus.0
+
+# Wait for the xv6 shell prompt
+expect {
+    "$ " {
+        send "testbench\r"
+    }
+    timeout {
+        puts "\nERROR: xv6 did not boot within 120 seconds"
+        exit 1
+    }
+}
+
+# Wait for testbench to finish and print its last line
+expect {
+    "All 5 custom syscalls executed successfully!" {
+        puts "\n\ntestbench completed successfully!"
+    }
+    timeout {
+        puts "\nERROR: testbench did not complete"
+        exit 1
+    }
+}
+
+# Give a moment then quit
+after 1000
+send "q\r"
+expect eof
